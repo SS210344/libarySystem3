@@ -32,9 +32,11 @@ public class Main {
         while(true) {
             System.out.println("options are 1:login  2: register 3:exit 4: admin login");
             int option = intValidate(1, 4);
+            // log in
             if(option == 1){
                 found = logIn(userPasswords);
             }
+            // register user
             if(option == 2) {
                 userPasswords=register( userPasswords);
                 WriteToFile(userPasswords, users);
@@ -43,21 +45,22 @@ public class Main {
 
 
             }
+            //exit
             if(option ==3){
                 break;
             }
+            // admin login
             if(option == 4){
-                found = logIn(userPasswords);
-                if(found) {
-                    // admin password is sg124htgz12d
-                    System.out.println("admin password");
-                    String password = userInput();
-                    password = Integer.toString(password.hashCode());
-                    if (password.equals("2002291397")) {
-                        admin = true;
-                    } else {
-                        System.out.println("you are not an admin");
-                    }
+                System.out.println("admin login");
+                File adminUsers = new File("AdminUsers.txt");
+                CreateFile(adminUsers);
+                ArrayList<ArrayList<String>> adminPasswords = new ArrayList<>();
+                ReadFile(adminUsers,adminPasswords);
+                admin = logIn(adminPasswords);
+                if(admin) {
+                    // admin password is sg124htgz12d user name is admin@libary.com
+                    found=true;
+
                 }
 
             }
