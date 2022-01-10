@@ -1,46 +1,42 @@
 package com.company;
 
-import javax.security.sasl.AuthorizeCallback;
+
 import java.io.File;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import com.company.fileHandling;
+import com.company.logIn;
+import com.company.objects.book;
 //myObj change the name and add try catch
 public class Main {
     private static File library = new File("books.txt");
     private static File users = new File("Users.txt");
     private static ArrayList<ArrayList<String>> books = new ArrayList<>();
-    private static final String EMAIL_PATTERN =
-            "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-                    + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-    private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+    private static ArrayList<String> objectBooks = new ArrayList<>();
+
 
 
     public static void main(String[] args) {
         // write your code here
         // login
         boolean found = false;
-        CreateFile(users);
+        fileHandling.CreateFile(users);
         ArrayList<ArrayList<String>> userPasswords = new ArrayList<>();
-        ReadFile(users, userPasswords);
+        fileHandling.ReadFile(users, userPasswords);
         boolean admin = false;
         while(true) {
             System.out.println("options are 1:login  2: register 3:exit 4: admin login");
             int option = intValidate(1, 4);
             // log in
             if(option == 1){
-                found = logIn(userPasswords);
+                found = logIn.logIn(userPasswords);
             }
             // register user
             if(option == 2) {
-                userPasswords=register( userPasswords);
-                WriteToFile(userPasswords, users);
-                ReadFile(users, userPasswords);
+                userPasswords=logIn.register( userPasswords);
+                fileHandling.WriteToFile(userPasswords, users);
+                fileHandling.ReadFile(users, userPasswords);
 
 
 
@@ -53,10 +49,10 @@ public class Main {
             if(option == 4){
                 System.out.println("admin login");
                 File adminUsers = new File("AdminUsers.txt");
-                CreateFile(adminUsers);
+                fileHandling.CreateFile(adminUsers);
                 ArrayList<ArrayList<String>> adminPasswords = new ArrayList<>();
-                ReadFile(adminUsers,adminPasswords);
-                admin = logIn(adminPasswords);
+                fileHandling.ReadFile(adminUsers,adminPasswords);
+                admin = logIn.logIn(adminPasswords);
                 if(admin) {
                     // admin password is sg124htgz12d user name is admin@libary.com
                     found=true;
@@ -73,121 +69,15 @@ public class Main {
 
         // books
         if(found) {
-            CreateFile(library);
-            ReadFile(library, books);
+            fileHandling.CreateFile(library);
+            fileHandling.ReadFile(library, books);
             mainMenu(admin);
         }
 
 
 
     }
-    public static ArrayList<ArrayList<String>> register(ArrayList<ArrayList<String>> userPasswords){
-        ArrayList<String> currentUser=new ArrayList<>();
-        while(true) {
-            System.out.println("email:");
-            String email = userInput();
-            boolean validEmail = isValidEmail(email);
-            currentUser.add(email);
-            System.out.println("password: needs 2 numbers and 2 letters and at least 8 letter long");
-            String password = userInput();
-            boolean validPassword = validatePassword(password);
-            password = Integer.toString(password.hashCode());
-            currentUser.add(password);
-            if(validEmail && validPassword){
-                break;
-            }
 
-        }
-
-        userPasswords.add(currentUser);
-        return userPasswords;
-    }
-    // validates email
-
-    public static boolean isValidEmail(final String email) {
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
-    }
-    // validates password
-    public static boolean validatePassword(String password){
-        boolean valid = false;
-        int charCount = 0;
-        int numCount = 0;
-        if(password.length()>= 8 ){
-            for (int i = 0; i < password.length(); i++) {
-                char ch = password.charAt(i);
-                if((ch >= '0') && (ch <= '9')){
-                    numCount++;
-                }
-                else{
-                    ch = Character.toUpperCase(ch);
-                    if((ch >= 'A') && (ch <= 'Z')){
-                        charCount++;
-                    }
-                }
-
-            }
-            if((charCount >= 2) && (numCount >= 2)){
-                valid=true;
-            }
-
-        }
-        else{
-            System.out.println("pass word needs to be at least 8 Chars long");
-        }
-        return valid;
-    }
-
-    public static boolean  logIn(ArrayList<ArrayList<String>> userPasswords){
-
-        boolean found = false;
-        int chances = 0;
-        while(true) {
-            System.out.println("userName:");
-            String UserName = userInput();
-            System.out.println("Password:");
-            String password = Integer.toString(userInput().hashCode());
-            for (int i = 0; i < userPasswords.toArray().length; i++) {
-
-                if (userPasswords.get(i).get(0).equals(UserName)) {
-                    if (userPasswords.get(i).get(1).equals(password)) {
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if(found){
-                System.out.println("valid user");
-                break;
-            }
-            else{
-                System.out.println("invalid user name or wrong password");
-            }
-            chances +=1;
-            if(chances>3){
-                System.out.println("guess to many time try again later ");
-                break;
-            }
-
-
-        }
-        return found;
-
-
-    }
-    //creates or finds the file
-    public static void CreateFile(File NewFile) {
-        try {
-            if (NewFile.createNewFile()) {
-                System.out.println("File created: " + NewFile.getName());
-            } else {
-                System.out.println("File already exists.");
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-    }
     // takes a user input
     public static String userInput() {
         Scanner input = new Scanner(System.in);
@@ -203,27 +93,7 @@ public class Main {
 
         return (UserInput);
     }
-    // writes user inputs to the file
-    public static void WriteToFile(ArrayList<ArrayList<String>> ArrayToWrite ,File File) {
-        try {
-            FileWriter myWriter = new FileWriter(File.getName(), false); //True means append to file contents, False means overwrite
-            // Overwrites everything in the file
-            for (int i = 0; i < ArrayToWrite.toArray().length; i++) {
-                for (int j = 0; j < ArrayToWrite.get(i).toArray().length; j++) {
-                    myWriter.write(ArrayToWrite.get(i).get(j)+";");
-                }
-                myWriter.write("\n");
 
-
-            }
-            myWriter.close();
-            System.out.println("Successfully wrote to the file.");
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-
-    }
     // let the user add books to the 2d array list
     public static void addBooks(ArrayList<ArrayList<String>> books){
         System.out.println("number of books");
@@ -263,36 +133,7 @@ public class Main {
 
 
     }
-    // delete the file
-    public static void DeleteFile(File File) {
-        if (File.delete()) {
-            System.out.println("Deleted the file: " + File.getName());
-        } else {
-            System.out.println("Failed to delete the file.");
-        }
-    }
-    // reads line in a file
-    public static void ReadFile(File File,ArrayList<ArrayList<String>> ArrayToRead) {
-        try {
-            Scanner myReader = new Scanner(File);
-            while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                String[] book =data.split(";");
-                ArrayList<String> values =new ArrayList<>();
-                for (int i = 0; i < book.length; i++) {
-                    values.add(book[i]);
-                }
-                ArrayToRead.add(values);
-
-
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-    }
-
+    // print books out
     public static void printBooks(){
         System.out.println("book name     isbn     author      genre ");
         for (int i = 0; i < books.toArray().length; i++) {
@@ -329,7 +170,7 @@ public class Main {
 
 
     }
-
+    // changes a single book
     public static void changeBook(){
 
         System.out.println("what to change 0:book name 1:isbn 2: author 3: genre ");
@@ -392,10 +233,17 @@ public class Main {
                     System.out.println("number to be greater than or equal to "+min+" and less than or equal to "+max);
                 }
             } catch (Exception e) {
-                   System.out.println("invalid input " + e);
+                System.out.println("invalid input " + e);
             }
         }
         return option;
+    }
+
+    private static void covertList(){
+        for (int i = 0; i < books.toArray().length; i++) {
+            books.get(i).get(0);
+
+        }
     }
 
 
@@ -422,7 +270,7 @@ public class Main {
             }
             // exit
             if(option == 3){
-                WriteToFile(books,library);
+                fileHandling.WriteToFile(books,library);
 
 
                 break;
@@ -430,7 +278,7 @@ public class Main {
             // add book
             if(option == 4){
                 addBooks(books);
-                WriteToFile(books,library);
+                fileHandling.WriteToFile(books,library);
 
             }
             // delete file
@@ -438,22 +286,22 @@ public class Main {
                 System.out.println("Do you want to delete this file now Y or N?");
                 String userOption = userInput();
                 if (userOption.equalsIgnoreCase("y")) {
-                    DeleteFile(library);
-                    CreateFile(library);
-                    ReadFile(library, books);
+                    fileHandling.DeleteFile(library);
+                    fileHandling.CreateFile(library);
+                    fileHandling.ReadFile(library, books);
                 }
             }
             //delete book
             if(option == 6){
                 DeleteBook();
-                WriteToFile(books,library);
-                ReadFile(library, books);
+                fileHandling.WriteToFile(books,library);
+                fileHandling.ReadFile(library, books);
             }
             // change book
             if(option == 7){
                 changeBook();
-                WriteToFile(books,library);
-                ReadFile(library, books);
+                fileHandling.WriteToFile(books,library);
+                fileHandling.ReadFile(library, books);
             }
 
 
