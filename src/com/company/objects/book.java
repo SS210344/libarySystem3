@@ -1,5 +1,7 @@
 package com.company.objects;
 
+import java.util.ArrayList;
+
 public class book {
     private String bookName;
     private String isbn;
@@ -12,9 +14,10 @@ public class book {
         this.author = author;
         this.genre = genre;
     }
+
     @Override
-    public String toString(){
-        return bookName+";"+isbn+";"+author+";"+genre+";";
+    public String toString() {
+        return bookName + ";" + isbn + ";" + author + ";" + genre + ";";
     }
 
     public String getBookName() {
@@ -49,3 +52,8 @@ public class book {
         this.genre = genre;
     }
 }
+
+
+
+
+

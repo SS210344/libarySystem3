@@ -8,22 +8,30 @@ import java.util.ArrayList;
 import com.company.fileHandling;
 import com.company.logIn;
 import com.company.objects.book;
+import com.company.objects.user;
+import com.company.borrowing;
+
+
 //myObj change the name and add try catch
 public class Main {
     private static File library = new File("books.txt");
     private static File users = new File("Users.txt");
     private static ArrayList<ArrayList<String>> books = new ArrayList<>();
+
+
     private static ArrayList<String> objectBooks = new ArrayList<>();
+    book CurrentBook = new book ("book name","isbn","author","genre");
 
 
 
     public static void main(String[] args) {
         // write your code here
+
         // login
         boolean found = false;
         fileHandling.CreateFile(users);
         ArrayList<ArrayList<String>> userPasswords = new ArrayList<>();
-        fileHandling.ReadFile(users, userPasswords);
+        userPasswords = fileHandling.ReadFile(users, userPasswords);
         boolean admin = false;
         while(true) {
             System.out.println("options are 1:login  2: register 3:exit 4: admin login");
@@ -36,7 +44,7 @@ public class Main {
             if(option == 2) {
                 userPasswords=logIn.register( userPasswords);
                 fileHandling.WriteToFile(userPasswords, users);
-                fileHandling.ReadFile(users, userPasswords);
+                userPasswords=fileHandling.ReadFile(users, userPasswords);
 
 
 
@@ -51,7 +59,7 @@ public class Main {
                 File adminUsers = new File("AdminUsers.txt");
                 fileHandling.CreateFile(adminUsers);
                 ArrayList<ArrayList<String>> adminPasswords = new ArrayList<>();
-                fileHandling.ReadFile(adminUsers,adminPasswords);
+                userPasswords=fileHandling.ReadFile(adminUsers,adminPasswords);
                 admin = logIn.logIn(adminPasswords);
                 if(admin) {
                     // admin password is sg124htgz12d user name is admin@libary.com
@@ -70,7 +78,7 @@ public class Main {
         // books
         if(found) {
             fileHandling.CreateFile(library);
-            fileHandling.ReadFile(library, books);
+            books = fileHandling.ReadFile(library, books);
             mainMenu(admin);
         }
 
@@ -94,133 +102,7 @@ public class Main {
         return (UserInput);
     }
 
-    // let the user add books to the 2d array list
-    public static void addBooks(ArrayList<ArrayList<String>> books){
-        System.out.println("number of books");
-        int booksNum;
-        while(true) {
-            try {
-                booksNum = Integer.parseInt(userInput());
-                if(booksNum>0){
-                    break;
-                }
-                else{
-                    System.out.println("number to be greater than 0");
-                }
-            }
-            catch(Exception e){
-                System.out.println("invalid input "+e);
-            }
-        }
-        for (int i = 0; i < booksNum; i++) {
-            ArrayList<String> currentBook=new ArrayList<>();
 
-            System.out.println("Book title");
-            currentBook.add(userInput());
-
-            System.out.println("isbn");
-            currentBook.add(userInput());
-
-            System.out.println("author");
-            currentBook.add(userInput());
-
-            System.out.println("genre");
-            currentBook.add(userInput());
-
-
-            books.add(currentBook);
-        }
-
-
-    }
-    // print books out
-    public static void printBooks(){
-        System.out.println("book name     isbn     author      genre ");
-        for (int i = 0; i < books.toArray().length; i++) {
-            for (int j = 0; j < books.get(i).toArray().length; j++) {
-                System.out.print(books.get(i).get(j)+"  ");
-            }
-            System.out.println(" ");
-        }
-
-
-
-    }
-    // deletes a book
-    public static void DeleteBook(){
-        System.out.println("book name:");
-        String bookName = userInput();
-        boolean found = false;
-        for (int i = 0; i < books.toArray().length; i++) {
-
-            if (books.get(i).get(0).equals(bookName)) {
-                found=true;
-
-                books.remove(i);
-
-            }
-        }
-        if(found){
-            System.out.println("found and deleted book");
-        }
-        else{
-            System.out.println("book not found");
-        }
-
-
-
-    }
-    // changes a single book
-    public static void changeBook(){
-
-        System.out.println("what to change 0:book name 1:isbn 2: author 3: genre ");
-        int change = intValidate(0, 3);
-        System.out.println("search by  0:book name 1:isbn 2: author 3: genre ");
-        int searchValue = intValidate(0, 3);
-        System.out.println("filled  name");
-        String filedName =userInput();
-        boolean found = false;
-        for (int i = 0; i < books.toArray().length; i++) {
-
-            if (books.get(i).get(searchValue).equals(filedName)) {
-                System.out.println("book found");
-                System.out.println("current value is ");
-                System.out.println(books.get(i).get(change));
-                System.out.println("new value:");
-                String newValue = userInput();
-                books.get(i).set(change,newValue);
-                found = true;
-                break;
-            }
-        }
-        if(!found){
-            System.out.println("book not found");
-        }
-    }
-    // search books
-    public static void searchBook(){
-        boolean found = false;
-        System.out.println("search by  0:book name 1:isbn 2: author 3: genre ");
-        int searchValue = intValidate(0, 3);
-        System.out.println("filled  name");
-        String filedName =userInput();
-        for (int i = 0; i < books.toArray().length; i++) {
-
-            if (books.get(i).get(searchValue).equals(filedName)) {
-                System.out.println("book found");
-                found = true;
-                for (int j = 0; j < books.get(i).toArray().length; j++) {
-                    System.out.print(books.get(i).get(j)+"  ");
-                }
-                System.out.println(" ");
-                break;
-
-            }
-        }
-        if(!found) {
-            System.out.println("book not found");
-        }
-    }
 
     private static int intValidate(int min,int max) {
         int option;
@@ -239,69 +121,80 @@ public class Main {
         return option;
     }
 
-    private static void covertList(){
-        for (int i = 0; i < books.toArray().length; i++) {
-            books.get(i).get(0);
 
-        }
-    }
+
+
 
 
     public static void mainMenu(boolean admin){
+        user currentUser = new user("name","password");
+        System.out.println("name:");
+        String userName=userInput();
+        currentUser.setUsername(userName);
         while(true){
             int option = 1;
-            System.out.println("options are 1:read file  2: search book 3:exit");
+            System.out.println("options are 1:read file  2: search book 3:borrow book 4:return book 5:exit");
             if(admin){
-                System.out.println("admin options 4:add book 5:delete file 6:delete book 7:change book");
+                System.out.println("admin options 6:add book 7:delete file 8:delete book 9:change book");
             }
             if (admin) {
-                option = intValidate(1, 7);
+                option = intValidate(1, 9);
             }
             else{
-                option = intValidate(1, 3);
+                option = intValidate(1, 5);
             }
             // read file
             if (option == 1){
-                printBooks();
+                bookHandling.printBooks(books);
             }
             // search book
             if(option == 2) {
-                searchBook();
+                bookHandling.searchBook(books);
+            }
+            // borrow book
+            if(option == 3) {
+                books = borrowing.borrow(userName,books);
+
+            }
+            // return book
+            if(option == 4) {
+                books = borrowing.returnBook(userName,books);
+
             }
             // exit
-            if(option == 3){
+            if(option == 5){
                 fileHandling.WriteToFile(books,library);
 
 
                 break;
             }
             // add book
-            if(option == 4){
-                addBooks(books);
+            if(option == 6){
+                bookHandling.addBooks(books);
                 fileHandling.WriteToFile(books,library);
 
             }
             // delete file
-            if(option == 5){
+            if(option == 7){
                 System.out.println("Do you want to delete this file now Y or N?");
                 String userOption = userInput();
                 if (userOption.equalsIgnoreCase("y")) {
                     fileHandling.DeleteFile(library);
                     fileHandling.CreateFile(library);
-                    fileHandling.ReadFile(library, books);
+                    books = fileHandling.ReadFile(library, books);
                 }
             }
             //delete book
-            if(option == 6){
-                DeleteBook();
+            if(option == 8){
+                books = bookHandling.DeleteBook(books);
                 fileHandling.WriteToFile(books,library);
                 fileHandling.ReadFile(library, books);
             }
             // change book
-            if(option == 7){
-                changeBook();
+            if(option == 9){
+                books = bookHandling.changeBook(books);
                 fileHandling.WriteToFile(books,library);
-                fileHandling.ReadFile(library, books);
+                books = fileHandling.ReadFile(library, books);
             }
 
 

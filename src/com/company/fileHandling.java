@@ -52,7 +52,7 @@ public class fileHandling {
         }
     }
     // reads line in a file
-    public static void ReadFile(File File,ArrayList<ArrayList<String>> ArrayToRead) {
+    public static ArrayList<ArrayList<String>> ReadFile(File File,ArrayList<ArrayList<String>> ArrayToRead) {
         try {
             Scanner myReader = new Scanner(File);
             while (myReader.hasNextLine()) {
@@ -71,5 +71,6 @@ public class fileHandling {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+        return ArrayToRead;
     }
 }
